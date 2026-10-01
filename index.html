@@ -1,0 +1,262 @@
+package com.suratsareefactory.app;
+
+import android.content.Intent;
+import android.graphics.Color;
+import android.net.Uri;
+import android.os.Bundle;
+import android.view.Gravity;
+import android.widget.*;
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    LinearLayout root, form;
+    EditText name, mobile, address, pincode, utr;
+
+    int PINK = Color.rgb(194, 24, 91);
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        registrationScreen();
+    }
+
+    TextView heading(String text, int size) {
+        TextView tv = new TextView(this);
+        tv.setText(text);
+        tv.setTextSize(size);
+        tv.setGravity(Gravity.CENTER);
+        tv.setPadding(10, 15, 10, 15);
+        return tv;
+    }
+
+    EditText input(String hint) {
+        EditText e = new EditText(this);
+        e.setHint(hint);
+        e.setTextSize(16);
+        e.setPadding(15, 5, 15, 5);
+
+        form.addView(e,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        65));
+
+        return e;
+    }
+
+    Button button(String text) {
+        Button b = new Button(this);
+        b.setText(text);
+        b.setTextColor(Color.WHITE);
+        b.setTextSize(16);
+        b.setAllCaps(false);
+        b.setBackgroundColor(PINK);
+
+        LinearLayout.LayoutParams p =
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        65);
+
+        p.setMargins(10, 10, 10, 10);
+        b.setLayoutParams(p);
+
+        return b;
+    }
+
+    void baseScreen() {
+        ScrollView scroll = new ScrollView(this);
+
+        root = new LinearLayout(this);
+        root.setOrientation(LinearLayout.VERTICAL);
+        root.setPadding(15, 15, 15, 20);
+
+        scroll.addView(root);
+        setContentView(scroll);
+    }
+
+    // ---------------- REGISTRATION ----------------
+
+    void registrationScreen() {
+
+        baseScreen();
+
+        root.addView(
+                heading("🌐 SURAT SAREE FACTORY", 25));
+
+        root.addView(
+                heading("Customer Registration", 21));
+
+        form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
+
+        root.addView(form);
+
+        name = input("Full Name *");
+        mobile = input("Mobile Number *");
+        address = input("Full Address *");
+        pincode = input("Pincode *");
+
+        Button next =
+                button("Continue to ₹500 Payment");
+
+        root.addView(next);
+
+        next.setOnClickListener(v -> {
+
+            if (!valid(name) ||
+                    !valid(mobile) ||
+                    !valid(address) ||
+                    !valid(pincode)) {
+
+                Toast.makeText(
+                        this,
+                        "कृपया सभी जानकारी भरें",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+            paymentScreen();
+        });
+    }
+
+    boolean valid(EditText e) {
+        return !e.getText()
+                .toString()
+                .trim()
+                .isEmpty();
+    }
+
+    // ---------------- PAYMENT ----------------
+
+    void paymentScreen() {
+
+        baseScreen();
+
+        root.addView(
+                heading("💳 Registration Payment", 25));
+
+        root.addView(
+                heading("Registration Fee: ₹500", 22));
+
+        TextView qr = heading(
+                "📷\n\nQR CODE\n\n" +
+                "यहाँ आपका QR Code लगाया जाएगा",
+                20);
+
+        qr.setGravity(Gravity.CENTER);
+        qr.setBackgroundColor(Color.LTGRAY);
+
+        root.addView(
+                qr,
+                new LinearLayout.LayoutParams(
+                        LinearLayout.LayoutParams.MATCH_PARENT,
+                        320));
+
+        root.addView(
+                heading(
+                        "₹500 Payment करने के बाद UTR / Transaction ID दर्ज करें",
+                        16));
+
+        form = new LinearLayout(this);
+        form.setOrientation(LinearLayout.VERTICAL);
+
+        root.addView(form);
+
+        utr = input("UTR / Transaction ID *");
+
+        Button submit =
+                button("Submit Registration");
+
+        root.addView(submit);
+
+        Button whatsapp =
+                button("📲 WhatsApp: 8239663425");
+
+        root.addView(whatsapp);
+
+        whatsapp.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(
+                            "https://wa.me/918239663425"
+                    )
+            );
+
+            startActivity(intent);
+        });
+
+        submit.setOnClickListener(v -> {
+
+            if (!valid(utr)) {
+
+                Toast.makeText(
+                        this,
+                        "UTR / Transaction ID भरें",
+                        Toast.LENGTH_SHORT
+                ).show();
+
+                return;
+            }
+
+            successScreen();
+        });
+    }
+
+    // ---------------- SUCCESS ----------------
+
+    void successScreen() {
+
+        baseScreen();
+
+        root.addView(
+                heading(
+                        "🎉 Registration Successful",
+                        26));
+
+        String registrationId =
+                "SSF-" +
+                (System.currentTimeMillis() % 1000000);
+
+        root.addView(
+                heading(
+                        "Registration ID: " +
+                        registrationId,
+                        20));
+
+        root.addView(
+                heading(
+                        "आपकी registration details प्राप्त हो गई हैं।",
+                        17));
+
+        Button whatsapp =
+                button(
+                        "📲 WhatsApp पर संपर्क करें"
+                );
+
+        root.addView(whatsapp);
+
+        whatsapp.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    Intent.ACTION_VIEW,
+                    Uri.parse(
+                            "https://wa.me/918239663425"
+                    )
+            );
+
+            startActivity(intent);
+        });
+
+        Button home =
+                button("Back to Registration");
+
+        root.addView(home);
+
+        home.setOnClickListener(
+                v -> registrationScreen()
+        );
+    }
+}
